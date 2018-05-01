@@ -12,6 +12,7 @@
 
     "output_dir": "/cis/home/tagarwal/deep_learning/FinalProject/outputs/",
 
+    "model": "ConvColumn",
     "num_classes": 27,
     "batch_size": 20,
     "clip_size": 18,

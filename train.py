@@ -17,6 +17,7 @@ import torch.utils.data
 from data_loader_jpeg import VideoFolder
 from callbacks import PlotLearning, MonitorLRDecay, AverageMeter
 from model import ConvColumn
+from model import C3D
 from torchvision.transforms import *
 
 
@@ -71,7 +72,12 @@ def main():
     signal.signal(signal.SIGINT, signal_handler)
 
     # create model
-    model = ConvColumn(config['num_classes'])
+    if config['model'] == 'ConvColumn':
+        model = ConvColumn(config['num_classes'])
+    if config['model'] == 'C3D':
+        model = C3D(config['num_classes'])
+    if config['model'] == 'LRCN':
+        model = LRCN(config['num_classes'])
 
     # multi GPU setting
     model = torch.nn.DataParallel(model, device_ids=gpus).cuda()
