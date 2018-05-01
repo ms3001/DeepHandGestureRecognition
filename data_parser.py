@@ -36,8 +36,8 @@ class JpegDataset(object):
     def get_two_way_dict(self, classes):
         classes_dict = {}
         for i, item in enumerate(classes):
-            classes.dict[item] = i
-            classes.dict[i] = item
+            classes_dict[item] = i
+            classes_dict[i] = item
         return classes_dict
 
 class GulpDataset(object):
