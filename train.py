@@ -203,7 +203,7 @@ def main():
         best_prec1 = max(val_top1, best_prec1)
         save_checkpoint({
             'epoch': epoch + 1,
-            'arch': "Conv4Col",
+            'arch': config['model'],
             'state_dict': model.state_dict(),
             'best_prec1': best_prec1,
         }, is_best, config)
