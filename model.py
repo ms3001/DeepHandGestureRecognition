@@ -73,7 +73,6 @@ class C3D(nn.Module):
         self.dropout = nn.Dropout(p=0.5)
 
         self.relu = nn.ReLU()
-        self.softmax = nn.Softmax()
 
     def forward(self, x):
 
@@ -102,9 +101,8 @@ class C3D(nn.Module):
         h = self.dropout(h)
 
         logits = self.fc8(h)
-        probs = self.softmax(logits)
 
-        return probs
+        return logits
 
 """
 References
