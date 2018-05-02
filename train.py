@@ -73,7 +73,7 @@ def main():
 
     # create model
     if config['model'] == 'ConvColumn':
-        model = ConvColumn(config['num_classes'])
+        model = ConvColumn(config['num_classes'], (config['kernel_depth'], config['kernel_height'], config['kernel_width']))
     if config['model'] == 'C3D':
         model = C3D(config['num_classes'])
     if config['model'] == 'LRCN':
