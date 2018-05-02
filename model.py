@@ -1,25 +1,84 @@
 import torch
 import torch.nn as nn
 
+def conv_output(shape, Kernel, Padding=(0, 0, 0), Stride=(1, 1, 1)):
+    """
+    Z : depth
+    Y : height
+    X : width
+    P : padding
+    K : kernel
+    """
+    Z, Y, X = shape
+    
+    Z_out = ((Z + 2 * Padding[0] - (Kernel[0] - 1) - 1) / Stride[0]) + 1
+    Y_out = ((Y + 2 * Padding[1] - (Kernel[1] - 1) - 1) / Stride[1]) + 1
+    X_out = ((X + 2 * Padding[2] - (Kernel[2] - 1) - 1) / Stride[2]) + 1
+    
+    return (Z_out, Y_out, X_out)
+
+def pool_output(shape, Kernel, Padding=(0, 0, 0), Stride=(1, 1, 1)):
+    """
+    Z : depth
+    Y : height
+    X : width
+    P : padding
+    K : kernel
+    """
+    Z, Y, X = shape
+
+    Z_out = math.floor(((Z + 2 * Padding[0] - (Kernel[0] - 1) - 1) / Stride[0]) + 1)
+    Y_out = math.floor(((Y + 2 * Padding[1] - (Kernel[1] - 1) - 1) / Stride[1]) + 1)
+    X_out = math.floor(((X + 2 * Padding[2] - (Kernel[2] - 1) - 1) / Stride[2]) + 1)
+        
+    return (Z_out, Y_out, X_out)
+
 class ConvColumn(nn.Module):
 
-    def __init__(self, num_classes):
+    def __init__(self, num_classes, kernel_size):
         super(ConvColumn, self).__init__()
 
-        self.conv_layer1 = self._make_conv_layer(3, 64, (1, 2, 2), (1, 2, 2))
-        self.conv_layer2 = self._make_conv_layer(64, 128, (2, 2, 2), (2, 2, 2))
+        self.conv_layer1 = self._make_conv_layer(3, 64, (1, 2, 2), (1, 2, 2), kernel_size=kernel_size)
+        self.conv_layer2 = self._make_conv_layer(64, 128, (2, 2, 2), (2, 2, 2), kernel_size=kernel_size)
         self.conv_layer3 = self._make_conv_layer(
-            128, 256, (2, 2, 2), (2, 2, 2))
+            128, 256, (2, 2, 2), (2, 2, 2), kernel_size=kernel_size)
         self.conv_layer4 = self._make_conv_layer(
-            256, 256, (2, 2, 2), (2, 2, 2))
+            256, 256, (2, 2, 2), (2, 2, 2), kernel_size=kernel_size)
 
-        self.fc5 = nn.Linear(12800, 512)
+        c = self._compute_linear_size(kernel_size)
+        linear_size = 256 * c[0] * c[1] * c[2]
+
+        self.fc5 = nn.Linear(c, 512)
         self.fc5_act = nn.ELU()
         self.fc6 = nn.Linear(512, num_classes)
 
-    def _make_conv_layer(self, in_c, out_c, pool_size, stride):
+    def _compute_linear_size(self, kernel_size):
+        shape = (18, 84, 84)
+        Conv_K = kernel_size
+        Padding = (1, 1, 1)
+        Stride = (1, 2, 2)
+        Pool_K = (1, 2, 2)
+
+        shape = conv_output(shape, Kernel=Conv_K, Padding=Padding)
+        shape = pool_output(shape, Kernel=Pool_K, Stride=Stride)
+
+        Pool_K = (2, 2, 2)
+        Stride = (2, 2, 2)
+
+        shape = conv_output(shape, Kernel=Conv_K, Padding=Padding)
+        shape = pool_output(shape, Kernel=Pool_K, Stride=Stride)
+
+        shape = conv_output(shape, Kernel=Conv_K, Padding=Padding)
+        shape = pool_output(shape, Kernel=Pool_K, Stride=Stride)
+
+        shape = conv_output(shape, Kernel=Conv_K, Padding=Padding)
+        shape = pool_output(shape, Kernel=Pool_K, Stride=Stride)
+
+        return shape
+
+    def _make_conv_layer(self, in_c, out_c, pool_size, stride, kernel_size=(3, 3, 3)):
         conv_layer = nn.Sequential(
-            nn.Conv3d(in_c, out_c, kernel_size=3, stride=1, padding=1),
+            nn.Conv3d(in_c, out_c, kernel_size=kernel_size, stride=1, padding=1),
             nn.BatchNorm3d(out_c),
             nn.ELU(),
             nn.MaxPool3d(pool_size, stride=stride, padding=0)
