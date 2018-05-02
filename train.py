@@ -18,6 +18,7 @@ from data_loader_jpeg import VideoFolder
 from callbacks import PlotLearning, MonitorLRDecay, AverageMeter
 from model import ConvColumn
 from model import C3D
+from model import LRCN
 from torchvision.transforms import *
 
 
@@ -77,7 +78,7 @@ def main():
     if config['model'] == 'C3D':
         model = C3D(config['num_classes'])
     if config['model'] == 'LRCN':
-        model = LRCN(config['num_classes'])
+        model = LRCN(config['num_classes'], (config['kernel_depth'], config['kernel_height'], config['kernel_width']))
 
     # multi GPU setting
     model = torch.nn.DataParallel(model, device_ids=gpus).cuda()

@@ -230,13 +230,15 @@ class LRCN(nn.Module):
         return conv_layer
 
     def forward(self, x):
+        print(x.size())
         x = self.conv_layer1(x)
         x = self.conv_layer2(x)
         x = self.conv_layer3(x)
         x = self.conv_layer4(x)
 
+        print(x.size())
         x = x.view(x.size(0), -1)
-
+        print(x.size())
         x = self.fc5(x)
         x = self.fc5_act(x)
 
