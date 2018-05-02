@@ -198,6 +198,7 @@ class LRCN(nn.Module):
         
         self.lstm = nn.LSTM(512, 256, num_layers=1, batch_first=True, dropout=0.2)
         self.fc6 = nn.Linear(256, num_classes)
+        self.softmax = nn.Softmax(dim=2)
 
     def _compute_linear_size(self, kernel_size):
         shape = (18, 84, 84)
@@ -241,14 +242,12 @@ class LRCN(nn.Module):
         x = x.permute(0, 2, 1, 3, 4)
         x = x.contiguous().view(x.size(0), x.size(1), -1)
         
-        print(x.size())
         x = self.fc5(x)
-        print(x.size())
         x = self.fc5_act(x)
-        print(x.size())
 
+        lstm_out, (hidden, context) = self.lstm(x)
+        x = self.fc6(lstm_out)
+        x = self.softmax(x)
+        x = torch.mean(x, dim=1)
 
-        #x = self.fc6(x)
         return x
-    
-    
