@@ -48,7 +48,7 @@ class ConvColumn(nn.Module):
         c = self._compute_linear_size(kernel_size)
         linear_size = 256 * c[0] * c[1] * c[2]
 
-        self.fc5 = nn.Linear(c, 512)
+        self.fc5 = nn.Linear(linear_size, 512)
         self.fc5_act = nn.ELU()
         self.fc6 = nn.Linear(512, num_classes)
 
