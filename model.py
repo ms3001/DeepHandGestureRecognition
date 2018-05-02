@@ -77,25 +77,40 @@ class C3D(nn.Module):
     def forward(self, x):
 
         h = self.relu(self.conv1(x))
+        print(h.size())
         h = self.pool1(h)
-
+        print(h.size())
+        
         h = self.relu(self.conv2(h))
+        print(h.size())
         h = self.pool2(h)
+        print(h.size())
 
         h = self.relu(self.conv3a(h))
+        print(h.size())
         h = self.relu(self.conv3b(h))
+        print(h.size())
         h = self.pool3(h)
+        print(h.size())
 
         h = self.relu(self.conv4a(h))
+        print(h.size())
         h = self.relu(self.conv4b(h))
+        print(h.size())
         h = self.pool4(h)
+        print(h.size())
 
         h = self.relu(self.conv5a(h))
+        print(h.size())
         h = self.relu(self.conv5b(h))
+        print(h.size())
         h = self.pool5(h)
+        print(h.size())
 
         h = h.view(h.size(0), -1)
+        print(h.size())
         h = self.relu(self.fc6(h))
+        
         h = self.dropout(h)
         h = self.relu(self.fc7(h))
         h = self.dropout(h)
