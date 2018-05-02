@@ -191,10 +191,13 @@ class LRCN(nn.Module):
         for i in c:
             if i != 0:
                 linear_size *= i
-                
+        linear_size = int(linear_size / 18)
+                        
         self.fc5 = nn.Linear(linear_size, 512)
         self.fc5_act = nn.ELU()
-        self.fc6 = nn.Linear(512, num_classes)
+        
+        self.lstm = nn.LSTM(512, 256, num_layers=1, batch_first=True, dropout=0.2)
+        self.fc6 = nn.Linear(256, num_classes)
 
     def _compute_linear_size(self, kernel_size):
         shape = (18, 84, 84)
@@ -230,19 +233,22 @@ class LRCN(nn.Module):
         return conv_layer
 
     def forward(self, x):
-        print(x.size())
         x = self.conv_layer1(x)
         x = self.conv_layer2(x)
         x = self.conv_layer3(x)
         x = self.conv_layer4(x)
 
-        print(x.size())
-        x = x.view(x.size(0), -1)
+        x = x.permute(0, 2, 1, 3, 4)
+        x = x.contiguous().view(x.size(0), x.size(1), -1)
+        
         print(x.size())
         x = self.fc5(x)
+        print(x.size())
         x = self.fc5_act(x)
+        print(x.size())
 
-        x = self.fc6(x)
+
+        #x = self.fc6(x)
         return x
     
     
