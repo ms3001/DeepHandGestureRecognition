@@ -1,5 +1,5 @@
 {
-    "model_name": "convcolumn_kernel_depth_5",
+    "model_name": "convcolumn_default",
     "checkpoint": null,
 
     "train_data_folder": "/cis/home/tagarwal/deep_learning/FinalProject/data/20bn-jester-v1/",
@@ -14,9 +14,6 @@
 
     "model": "ConvColumn",
     "num_classes": 27,
-    "kernel_depth": 5,
-    "kernel_width": 3,
-    "kernel_height": 3,
     "batch_size": 20,
     "clip_size": 18,
     "nclips": 1,

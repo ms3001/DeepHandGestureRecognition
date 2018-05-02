@@ -1,5 +1,5 @@
 {
-    "model_name": "second_test",
+    "model_name": "convcolumn_kernel_depth_4",
     "checkpoint": null,
 
     "train_data_folder": "/cis/home/tagarwal/deep_learning/FinalProject/data/20bn-jester-v1/",
@@ -12,9 +12,12 @@
 
     "output_dir": "/cis/home/tagarwal/deep_learning/FinalProject/outputs/",
 
-    "model": "C3D",
+    "model": "ConvColumn",
     "num_classes": 27,
-    "batch_size": 50,
+    "kernel_depth": 4,
+    "kernel_width": 3,
+    "kernel_height": 3,
+    "batch_size": 20,
     "clip_size": 18,
     "nclips": 1,
     "step_size": 2,

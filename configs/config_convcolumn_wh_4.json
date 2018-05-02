@@ -1,5 +1,5 @@
 {
-    "model_name": "first_test",
+    "model_name": "convcolumn_wh_4",
     "checkpoint": null,
 
     "train_data_folder": "/cis/home/tagarwal/deep_learning/FinalProject/data/20bn-jester-v1/",
@@ -14,7 +14,10 @@
 
     "model": "ConvColumn",
     "num_classes": 27,
-    "batch_size": 20,
+    "kernel_depth": 3,
+    "kernel_width": 4,
+    "kernel_height": 4,
+    "batch_size": 25,
     "clip_size": 18,
     "nclips": 1,
     "step_size": 2,
