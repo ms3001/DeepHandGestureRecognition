@@ -94,9 +94,7 @@ class C3D(nn.Module):
         h = self.relu(self.conv5b(h))
         h = self.pool5(h)
 
-        print(h.size())
         h = h.view(h.size(0), -1)
-        print(h.size())
         h = self.relu(self.fc6(h))
         
         h = self.dropout(h)
