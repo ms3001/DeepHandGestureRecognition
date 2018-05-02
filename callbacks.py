@@ -164,7 +164,7 @@ class PlotLearning(object):
 
         plt.figure(1)
         plt.gca().cla()
-        plt.ylim(0, 1)
+        plt.ylim(0, 100)
         plt.plot(self.accuracy, label='train')
         plt.plot(self.val_accuracy, label='valid')
         plt.title("best_val@{0:}-{1:.2f}, best_train@{2:}-{3:.2f}".format(
