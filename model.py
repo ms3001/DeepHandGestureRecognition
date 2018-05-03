@@ -196,7 +196,7 @@ class LRCN(nn.Module):
         self.fc5 = nn.Linear(linear_size, 512)
         self.fc5_act = nn.ELU()
         
-        self.lstm = nn.LSTM(512, 256, num_layers=1, batch_first=True, dropout=0.2)
+        self.lstm = nn.LSTM(512, 256, num_layers=1, batch_first=True)
         self.fc6 = nn.Linear(256, num_classes)
         self.softmax = nn.Softmax(dim=2)
 
