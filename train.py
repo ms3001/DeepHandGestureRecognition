@@ -148,15 +148,17 @@ def main():
     criterion = nn.CrossEntropyLoss().cuda()
 
     # define optimizer
+    lr = config["lr"]
+    last_lr = config["last_lr"]
+    momentum = config['momentum']
+    weight_decay = config['weight_decay']
+    
     if args.optimizer == 'adadelta':
         optimizer = torch.optim.Adadelta(model.parameters())
     elif args.optimizer == 'adam':
         optimizer = torch.optim.Adam(mode.parameters())
     elif args.optimizer == 'sgd':
-        lr = config["lr"]
-        last_lr = config["last_lr"]
-        momentum = config['momentum']
-        weight_decay = config['weight_decay']
+        
         optimizer = torch.optim.SGD(model.parameters(), lr,
                                     momentum=momentum,
                                     weight_decay=weight_decay)
