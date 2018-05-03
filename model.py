@@ -246,8 +246,10 @@ class LRCN(nn.Module):
         x = self.fc5_act(x)
 
         lstm_out, (hidden, context) = self.lstm(x)
-        x = self.fc6(lstm_out)
-        x = self.softmax(x)
-        x = torch.mean(x, dim=1)
+        print(hidden.size())
+        x = hidden.view(-1, hidden.size(2))
+        print(x.size())
+        x = self.fc6(x)
+        print(x.size())
 
         return x
