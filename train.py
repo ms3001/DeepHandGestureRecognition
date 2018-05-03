@@ -30,6 +30,7 @@ parser.add_argument('--eval_only', '-e',
 parser.add_argument(
     '--resume', '-r', help="resume training from given checkpoint.")
 parser.add_argument('--gpus', '-g', help="gpu ids for use.")
+parser.add_argument('--optimizer', '-o', default='sgd', help="optimizer of choice")
 
 args = parser.parse_args()
 if len(sys.argv) < 2:
@@ -147,13 +148,20 @@ def main():
     criterion = nn.CrossEntropyLoss().cuda()
 
     # define optimizer
-    lr = config["lr"]
-    last_lr = config["last_lr"]
-    momentum = config['momentum']
-    weight_decay = config['weight_decay']
-    optimizer = torch.optim.SGD(model.parameters(), lr,
-                                momentum=momentum,
-                                weight_decay=weight_decay)
+    if args.optimizer == 'adadelta':
+        optimizer = torch.optim.adadelta(model.parameters())
+    elif args.optimizer == 'adam':
+        optimizer = torch.optime.adam(mode.parameters())
+    elif args.optimizer == 'sgd':
+        lr = config["lr"]
+        last_lr = config["last_lr"]
+        momentum = config['momentum']
+        weight_decay = config['weight_decay']
+        optimizer = torch.optim.SGD(model.parameters(), lr,
+                                    momentum=momentum,
+                                    weight_decay=weight_decay)
+    else:
+        raise ValueError('Unsupported optimizer: ' + args.optimizer)
 
     if args.eval_only:
         validate(val_loader, model, criterion, train_data.classes_dict)
