@@ -17,7 +17,7 @@
     "kernel_depth": 1,
     "kernel_width": 3,
     "kernel_height": 3,
-    "batch_size": 20,
+    "batch_size": 50,
     "clip_size": 18,
     "nclips": 1,
     "step_size": 2,
