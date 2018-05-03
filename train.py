@@ -149,9 +149,9 @@ def main():
 
     # define optimizer
     if args.optimizer == 'adadelta':
-        optimizer = torch.optim.adadelta(model.parameters())
+        optimizer = torch.optim.Adadelta(model.parameters())
     elif args.optimizer == 'adam':
-        optimizer = torch.optime.adam(mode.parameters())
+        optimizer = torch.optim.Adam(mode.parameters())
     elif args.optimizer == 'sgd':
         lr = config["lr"]
         last_lr = config["last_lr"]
