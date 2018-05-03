@@ -246,10 +246,7 @@ class LRCN(nn.Module):
         x = self.fc5_act(x)
 
         lstm_out, (hidden, context) = self.lstm(x)
-        print(hidden.size())
         x = torch.squeeze(hidden)
-        print(x.size())
         x = self.fc6(x)
-        print(x.size())
 
         return x
