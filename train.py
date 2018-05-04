@@ -21,16 +21,16 @@ from model import C3D
 from model import LRCN
 from torchvision.transforms import *
 
-
 parser = argparse.ArgumentParser(
     description='PyTorch Jester Training using JPEG')
 parser.add_argument('--config', '-c', help='json config file path')
-parser.add_argument('--eval_only', '-e',
-                    help="evaluate trained model on validation data.")
+parser.add_argument(
+    '--eval_only', '-e', help="evaluate trained model on validation data.")
 parser.add_argument(
     '--resume', '-r', help="resume training from given checkpoint.")
 parser.add_argument('--gpus', '-g', help="gpu ids for use.")
-parser.add_argument('--optimizer', '-o', default='sgd', help="optimizer of choice")
+parser.add_argument(
+    '--optimizer', '-o', default='sgd', help="optimizer of choice")
 
 args = parser.parse_args()
 if len(sys.argv) < 2:
@@ -70,16 +70,21 @@ def main():
             shutil.rmtree(save_dir)
         print('You pressed Ctrl+C!')
         sys.exit(0)
+
     # assign Ctrl+C signal handler
     signal.signal(signal.SIGINT, signal_handler)
 
     # create model
     if config['model'] == 'ConvColumn':
-        model = ConvColumn(config['num_classes'], (config['kernel_depth'], config['kernel_height'], config['kernel_width']))
+        model = ConvColumn(config['num_classes'],
+                           (config['kernel_depth'], config['kernel_height'],
+                            config['kernel_width']))
     if config['model'] == 'C3D':
         model = C3D(config['num_classes'])
     if config['model'] == 'LRCN':
-        model = LRCN(config['num_classes'], (config['kernel_depth'], config['kernel_height'], config['kernel_width']))
+        model = LRCN(config['num_classes'],
+                     (config['kernel_depth'], config['kernel_height'],
+                      config['kernel_width']))
 
     # multi GPU setting
     model = torch.nn.DataParallel(model, device_ids=gpus).cuda()
@@ -92,8 +97,8 @@ def main():
             args.start_epoch = checkpoint['epoch']
             best_prec1 = checkpoint['best_prec1']
             model.load_state_dict(checkpoint['state_dict'])
-            print("=> loaded checkpoint '{}' (epoch {})"
-                  .format(config['checkpoint'], checkpoint['epoch']))
+            print("=> loaded checkpoint '{}' (epoch {})".format(
+                config['checkpoint'], checkpoint['epoch']))
         else:
             print("=> no checkpoint found at '{}'".format(
                 config['checkpoint']))
@@ -104,42 +109,47 @@ def main():
     transform = Compose([
         CenterCrop(84),
         ToTensor(),
-        Normalize(mean=[0.485, 0.456, 0.406],
-                  std=[0.229, 0.224, 0.225])
+        Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
     ])
 
-    train_data = VideoFolder(root=config['train_data_folder'],
-                             csv_file_input=config['train_data_csv'],
-                             csv_file_labels=config['labels_csv'],
-                             clip_size=config['clip_size'],
-                             nclips=1,
-                             step_size=config['step_size'],
-                             is_val=False,
-                             transform=transform,
-                             )
+    train_data = VideoFolder(
+        root=config['train_data_folder'],
+        csv_file_input=config['train_data_csv'],
+        csv_file_labels=config['labels_csv'],
+        clip_size=config['clip_size'],
+        nclips=1,
+        step_size=config['step_size'],
+        is_val=False,
+        transform=transform,
+    )
 
     print(" > Using {} processes for data loader.".format(
         config["num_workers"]))
     train_loader = torch.utils.data.DataLoader(
         train_data,
-        batch_size=config['batch_size'], shuffle=True,
-        num_workers=config['num_workers'], pin_memory=True,
+        batch_size=config['batch_size'],
+        shuffle=True,
+        num_workers=config['num_workers'],
+        pin_memory=True,
         drop_last=True)
 
-    val_data = VideoFolder(root=config['val_data_folder'],
-                           csv_file_input=config['val_data_csv'],
-                           csv_file_labels=config['labels_csv'],
-                           clip_size=config['clip_size'],
-                           nclips=1,
-                           step_size=config['step_size'],
-                           is_val=True,
-                           transform=transform,
-                           )
+    val_data = VideoFolder(
+        root=config['val_data_folder'],
+        csv_file_input=config['val_data_csv'],
+        csv_file_labels=config['labels_csv'],
+        clip_size=config['clip_size'],
+        nclips=1,
+        step_size=config['step_size'],
+        is_val=True,
+        transform=transform,
+    )
 
     val_loader = torch.utils.data.DataLoader(
         val_data,
-        batch_size=config['batch_size'], shuffle=False,
-        num_workers=config['num_workers'], pin_memory=True,
+        batch_size=config['batch_size'],
+        shuffle=False,
+        num_workers=config['num_workers'],
+        pin_memory=True,
         drop_last=False)
 
     assert len(train_data.classes) == config["num_classes"]
@@ -152,16 +162,20 @@ def main():
     last_lr = config["last_lr"]
     momentum = config['momentum']
     weight_decay = config['weight_decay']
-    
+
     if args.optimizer == 'adadelta':
-        optimizer = torch.optim.Adadelta(model.parameters())
+        optimizer = torch.optim.Adadelta(
+            model.parameters(), weight_decay=weight_decay)
     elif args.optimizer == 'adam':
-        optimizer = torch.optim.Adam(mode.parameters())
+        optimizer = torch.optim.Adam(
+            model.parameters(), weight_decay=weight_decay)
     elif args.optimizer == 'sgd':
-        
-        optimizer = torch.optim.SGD(model.parameters(), lr,
-                                    momentum=momentum,
-                                    weight_decay=weight_decay)
+
+        optimizer = torch.optim.SGD(
+            model.parameters(),
+            lr,
+            momentum=momentum,
+            weight_decay=weight_decay)
     else:
         raise ValueError('Unsupported optimizer: ' + args.optimizer)
 
@@ -170,8 +184,8 @@ def main():
         return
 
     # set callbacks
-    plotter = PlotLearning(os.path.join(
-        save_dir, "plots"), config["num_classes"])
+    plotter = PlotLearning(
+        os.path.join(save_dir, "plots"), config["num_classes"])
     lr_decayer = MonitorLRDecay(0.6, 3)
     val_loss = 9999999
 
@@ -194,8 +208,8 @@ def main():
             sys.exit(1)
 
         # train for one epoch
-        train_loss, train_top1, train_top5 = train(
-            train_loader, model, criterion, optimizer, epoch)
+        train_loss, train_top1, train_top5 = train(train_loader, model,
+                                                   criterion, optimizer, epoch)
 
         # evaluate on validation set
         val_loss, val_top1, val_top5 = validate(val_loader, model, criterion)
@@ -255,7 +269,12 @@ def train(train_loader, model, criterion, optimizer, epoch):
                   'Loss {loss.val:.4f} ({loss.avg:.4f})\t'
                   'Prec@1 {top1.val:.3f} ({top1.avg:.3f})\t'
                   'Prec@5 {top5.val:.3f} ({top5.avg:.3f})'.format(
-                      epoch, i, len(train_loader), loss=losses, top1=top1, top5=top5))
+                      epoch,
+                      i,
+                      len(train_loader),
+                      loss=losses,
+                      top1=top1,
+                      top5=top5))
     return losses.avg, top1.avg, top5.avg
 
 
@@ -273,7 +292,8 @@ def validate(val_loader, model, criterion, class_to_idx=None):
     for i, (input, target) in enumerate(val_loader):
 
         input_vars = torch.autograd.Variable(input.cuda(), volatile=True)
-        target_var = torch.autograd.Variable(target.cuda(async=True), volatile=True)
+        target_var = torch.autograd.Variable(
+            target.cuda(async=True), volatile=True)
 
         # compute output and loss
         output = model(input_vars)
@@ -296,8 +316,8 @@ def validate(val_loader, model, criterion, class_to_idx=None):
                   'Prec@5 {top5.val:.3f} ({top5.avg:.3f})'.format(
                       i, len(val_loader), loss=losses, top1=top1, top5=top5))
 
-    print(' * Prec@1 {top1.avg:.3f} Prec@5 {top5.avg:.3f}'
-          .format(top1=top1, top5=top5))
+    print(' * Prec@1 {top1.avg:.3f} Prec@5 {top5.avg:.3f}'.format(
+        top1=top1, top5=top5))
 
     if args.eval_only:
         logits_matrix = np.concatenate(logits_matrix)
@@ -309,23 +329,23 @@ def validate(val_loader, model, criterion, class_to_idx=None):
 
 def save_results(logits_matrix, targets_list, class_to_idx, config):
     print("Saving inference results ...")
-    path_to_save = os.path.join(
-        config['output_dir'], config['model_name'], "test_results.pkl")
+    path_to_save = os.path.join(config['output_dir'], config['model_name'],
+                                "test_results.pkl")
     with open(path_to_save, "wb") as f:
         pickle.dump([logits_matrix, targets_list, class_to_idx], f)
 
 
 def save_checkpoint(state, is_best, config, filename='checkpoint.pth.tar'):
-    checkpoint_path = os.path.join(
-        config['output_dir'], config['model_name'], filename)
-    model_path = os.path.join(
-        config['output_dir'], config['model_name'], 'model_best.pth.tar')
+    checkpoint_path = os.path.join(config['output_dir'], config['model_name'],
+                                   filename)
+    model_path = os.path.join(config['output_dir'], config['model_name'],
+                              'model_best.pth.tar')
     torch.save(state, checkpoint_path)
     if is_best:
         shutil.copyfile(checkpoint_path, model_path)
 
 
-def accuracy(output, target, topk=(1,)):
+def accuracy(output, target, topk=(1, )):
     """Computes the precision@k for the specified values of k"""
     maxk = max(topk)
     batch_size = target.size(0)
