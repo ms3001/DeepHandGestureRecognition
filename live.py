@@ -1,7 +1,14 @@
-import numpy as np
+from collections import OrderedDict
 import cv2
-#import cPickle as pickle
+import numpy as np
+import pickle
+from model import ConvColumn
+from PIL import Image
 from time import time
+import torch
+from torch.autograd import Variable
+from torchvision.transforms import *
+
 
 # Load trained Model
 #print("Loading trained SVM Model and PCA information...")
@@ -45,24 +52,61 @@ ges[26] = '26'
 # Set up some storage variables
 t = time()
 seq_len = 18
+imgs = []
 
+# Load model
+print('Loading model...')
+state_dict = torch.load('model_best.pth.tar', map_location='cpu')['state_dict']
+
+state_dict_rename = OrderedDict()
+for k, v in state_dict.items():
+	name = k[7:] # remove 'module.'
+	state_dict_rename[name] = v
+
+model = ConvColumn(27,(3, 3, 3))
+model.load_state_dict(state_dict_rename)
+
+transform = Compose([CenterCrop(84), ToTensor()])
+print('Starting prediction')
 # Run program till q is pressed
 while(True):
 
 	# Capture frame-by-frame
 	ret, frame = cam.read()
 
-	# Set up input for model
+	print(np.shape(frame))
 
+	# Set up input for model
+	resized_frame = cv2.resize(frame, (149, 84))
+
+	print(np.shape(resized_frame))
+
+	pre_img = Image.fromarray(resized_frame.astype('uint8'), 'RGB')
+
+	print(pre_img.size)
+	print(pre_img.mode)
+
+	img = transform(pre_img)
+	print(img.size())
+	imgs.append(torch.unsqueeze(img, 0))
+
+	if len(imgs) > 18:
+		imgs.pop(0)
 
 	# Get model output prediction
+	if len(imgs) == 18:
+		# format data to torch
+		data = torch.cat(imgs)
+		data = data.permute(1, 0, 2, 3)
+		print(data.size())
+		pred = model(Variable(data).unsqueeze(0))
+		print('Prediction:', pred)
 
 
 	# Displat output prediction overlayed on image frame
 	font = cv2.FONT_HERSHEY_SIMPLEX
 	cv2.imshow('preview',frame)
 	#cv2.putText(frame, ges[pred],(40,40), font, 1,(255,0,0),2)
-	#cv2.waitKey()
 
 	# Print time taken per loop
 	print(time() - t)
