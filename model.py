@@ -196,7 +196,7 @@ class LRCN(nn.Module):
         self.fc5 = nn.Linear(linear_size, 512)
         self.fc5_act = nn.ELU()
         
-        self.lstm = nn.LSTM(512, 256, num_layers=2, batch_first=True, dropout=0.2)
+        self.lstm = nn.LSTM(512, 256, num_layers=1, batch_first=True, dropout=0.2)
         self.fc6 = nn.Linear(256, num_classes)
         self.softmax = nn.Softmax(dim=2)
 
@@ -246,8 +246,8 @@ class LRCN(nn.Module):
         x = self.fc5_act(x)
 
         lstm_out, (hidden, context) = self.lstm(x)
-        x = torch.mean(hidden, dim=0)
-        x = torch.squeeze(x)
+        #x = torch.mean(hidden, dim=0)
+        x = torch.squeeze(hidden)
         x = self.fc6(x)
 
         return x

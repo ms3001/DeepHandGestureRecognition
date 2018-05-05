@@ -1,0 +1,30 @@
+{
+    "model_name": "lrcn_dropout_0.2",
+    "checkpoint": null,
+
+    "train_data_folder": "/cis/home/tagarwal/deep_learning/FinalProject/data/20bn-jester-v1/",
+    "val_data_folder": "/cis/home/tagarwal/deep_learning/FinalProject/data/20bn-jester-v1/",
+    "train_data_csv": "/cis/home/tagarwal/deep_learning/FinalProject/data/csv/jester-v1-train.csv",
+    "val_data_csv": "/cis/home/tagarwal/deep_learning/FinalProject/data/csv/jester-v1-validation.csv",
+    "labels_csv": "/cis/home/tagarwal/deep_learning/FinalProject/data/csv/jester-v1-labels.csv",
+
+    "num_workers": 10,
+
+    "output_dir": "/cis/home/tagarwal/deep_learning/FinalProject/outputs/",
+
+    "model": "LRCN",
+    "num_classes": 27,
+    "kernel_depth": 1,
+    "kernel_width": 3,
+    "kernel_height": 3,
+    "batch_size": 50,
+    "clip_size": 18,
+    "nclips": 1,
+    "step_size": 2,
+    "lr": 0.001,
+    "last_lr": 0.00001,
+    "momentum": 0.9,
+    "weight_decay": 0.00001,
+    "num_epochs": -1,
+    "print_freq": 100
+}
