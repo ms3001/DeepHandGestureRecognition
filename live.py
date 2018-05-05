@@ -48,11 +48,13 @@ ges[23] = '23'
 ges[24] = '24'
 ges[25] = '25'
 ges[26] = '26'
+ges[27] = 'waiting for more frames'
 
 # Set up some storage variables
 t = time()
 seq_len = 18
 imgs = []
+pred = 27
 
 # Load model
 print('Loading model...')
@@ -74,20 +76,20 @@ while(True):
 	# Capture frame-by-frame
 	ret, frame = cam.read()
 
-	print(np.shape(frame))
+	#print(np.shape(frame))
 
 	# Set up input for model
 	resized_frame = cv2.resize(frame, (149, 84))
 
-	print(np.shape(resized_frame))
+	#print(np.shape(resized_frame))
 
 	pre_img = Image.fromarray(resized_frame.astype('uint8'), 'RGB')
 
-	print(pre_img.size)
-	print(pre_img.mode)
+	#print(pre_img.size)
+	#print(pre_img.mode)
 
 	img = transform(pre_img)
-	print(img.size())
+	#print(img.size())
 	imgs.append(torch.unsqueeze(img, 0))
 
 	if len(imgs) > 18:
@@ -98,15 +100,20 @@ while(True):
 		# format data to torch
 		data = torch.cat(imgs)
 		data = data.permute(1, 0, 2, 3)
-		print(data.size())
-		pred = model(Variable(data).unsqueeze(0))
-		print('Prediction:', pred)
+	#	print(data.size())
+		output = model(Variable(data).unsqueeze(0))
+		out = (output.data).cpu().numpy()[0]
+		print('Model output:', out)
+		indices = np.argmax(out)
+		print('Max index:', indices)
+		pred = indices
 
 
 	# Displat output prediction overlayed on image frame
+	
 	font = cv2.FONT_HERSHEY_SIMPLEX
 	cv2.imshow('preview',frame)
-	#cv2.putText(frame, ges[pred],(40,40), font, 1,(255,0,0),2)
+	cv2.putText(frame, ges[pred],(40,40), font, 1,(0,0,0),2)
 
 	# Print time taken per loop
 	print(time() - t)
